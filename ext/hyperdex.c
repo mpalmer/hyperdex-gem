@@ -27,28 +27,16 @@
  */
 
 /* Ruby */
-#include <ruby.h>
-
-/* HyperDex */
-#include "visibility.h"
+#include <ruby/ruby.h>
 
 VALUE mod_hyperdex;
 
-void
-Init_hyperdex_client();
+void Init_hyperdex_client(void);
 
 void
-Init_hyperdex_admin();
-
-HYPERDEX_API void
-Init_hyperdex()
+Init__hyperdex()
 {
     mod_hyperdex = rb_define_module("HyperDex");
 
-#ifdef HYPERDEX_CLIENT
     Init_hyperdex_client();
-#endif
-#ifdef HYPERDEX_ADMIN
-    Init_hyperdex_admin();
-#endif
 };

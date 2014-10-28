@@ -30,97 +30,109 @@
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_key__status_attributes(int64_t (*f)(struct hyperdex_client* client, const char* space, const char* key, size_t key_sz, enum hyperdex_client_returncode* status, const struct hyperdex_client_attribute** attrs, size_t* attrs_sz), VALUE self, VALUE spacename, VALUE key)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const char* in_key;
     size_t in_key_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_key(o->arena, key, &in_key, &in_key_sz);
-    o->reqid = f(client, in_space, in_key, in_key_sz, &o->status, &o->attrs, &o->attrs_sz);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    const struct hyperdex_client_attribute** attrs = IV2PTR(deferred, "@attrs_ptr");
+    size_t* attrs_sz = IV2PTR(deferred, "@attrs_sz_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_key(arena, key, &in_key, &in_key_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_key, in_key_sz, status, attrs, attrs_sz);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status_attributes;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+    rb_iv_set(deferred, "@attrs", Qtrue);
+    rb_iv_set(deferred, "@attrs_sz", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_key_attributenames__status_attributes(int64_t (*f)(struct hyperdex_client* client, const char* space, const char* key, size_t key_sz, const char** attrnames, size_t attrnames_sz, enum hyperdex_client_returncode* status, const struct hyperdex_client_attribute** attrs, size_t* attrs_sz), VALUE self, VALUE spacename, VALUE key, VALUE attributenames)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const char* in_key;
     size_t in_key_sz;
     const char** in_attrnames;
     size_t in_attrnames_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_key(o->arena, key, &in_key, &in_key_sz);
-    hyperdex_ruby_client_convert_attributenames(o->arena, attributenames, &in_attrnames, &in_attrnames_sz);
-    o->reqid = f(client, in_space, in_key, in_key_sz, in_attrnames, in_attrnames_sz, &o->status, &o->attrs, &o->attrs_sz);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    const struct hyperdex_client_attribute** attrs = IV2PTR(deferred, "@attrs_ptr");
+    size_t* attrs_sz = IV2PTR(deferred, "@attrs_sz_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_key(arena, key, &in_key, &in_key_sz);
+    hyperdex_ruby_client_convert_attributenames(arena, attributenames, &in_attrnames, &in_attrnames_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_key, in_key_sz, in_attrnames, in_attrnames_sz, status, attrs, attrs_sz);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status_attributes;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+    rb_iv_set(deferred, "@attrs", Qtrue);
+    rb_iv_set(deferred, "@attrs_sz", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_key_attributes__status(int64_t (*f)(struct hyperdex_client* client, const char* space, const char* key, size_t key_sz, const struct hyperdex_client_attribute* attrs, size_t attrs_sz, enum hyperdex_client_returncode* status), VALUE self, VALUE spacename, VALUE key, VALUE attributes)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const char* in_key;
     size_t in_key_sz;
     const struct hyperdex_client_attribute* in_attrs;
     size_t in_attrs_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_key(o->arena, key, &in_key, &in_key_sz);
-    hyperdex_ruby_client_convert_attributes(o->arena, attributes, &in_attrs, &in_attrs_sz);
-    o->reqid = f(client, in_space, in_key, in_key_sz, in_attrs, in_attrs_sz, &o->status);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_key(arena, key, &in_key, &in_key_sz);
+    hyperdex_ruby_client_convert_attributes(arena, attributes, &in_attrs, &in_attrs_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_key, in_key_sz, in_attrs, in_attrs_sz, status);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_key_predicates_attributes__status(int64_t (*f)(struct hyperdex_client* client, const char* space, const char* key, size_t key_sz, const struct hyperdex_client_attribute_check* checks, size_t checks_sz, const struct hyperdex_client_attribute* attrs, size_t attrs_sz, enum hyperdex_client_returncode* status), VALUE self, VALUE spacename, VALUE key, VALUE predicates, VALUE attributes)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const char* in_key;
     size_t in_key_sz;
@@ -128,123 +140,127 @@ hyperdex_ruby_client_asynccall__spacename_key_predicates_attributes__status(int6
     size_t in_checks_sz;
     const struct hyperdex_client_attribute* in_attrs;
     size_t in_attrs_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_key(o->arena, key, &in_key, &in_key_sz);
-    hyperdex_ruby_client_convert_predicates(o->arena, predicates, &in_checks, &in_checks_sz);
-    hyperdex_ruby_client_convert_attributes(o->arena, attributes, &in_attrs, &in_attrs_sz);
-    o->reqid = f(client, in_space, in_key, in_key_sz, in_checks, in_checks_sz, in_attrs, in_attrs_sz, &o->status);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_key(arena, key, &in_key, &in_key_sz);
+    hyperdex_ruby_client_convert_predicates(arena, predicates, &in_checks, &in_checks_sz);
+    hyperdex_ruby_client_convert_attributes(arena, attributes, &in_attrs, &in_attrs_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_key, in_key_sz, in_checks, in_checks_sz, in_attrs, in_attrs_sz, status);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_key__status(int64_t (*f)(struct hyperdex_client* client, const char* space, const char* key, size_t key_sz, enum hyperdex_client_returncode* status), VALUE self, VALUE spacename, VALUE key)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const char* in_key;
     size_t in_key_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_key(o->arena, key, &in_key, &in_key_sz);
-    o->reqid = f(client, in_space, in_key, in_key_sz, &o->status);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_key(arena, key, &in_key, &in_key_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_key, in_key_sz, status);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_key_predicates__status(int64_t (*f)(struct hyperdex_client* client, const char* space, const char* key, size_t key_sz, const struct hyperdex_client_attribute_check* checks, size_t checks_sz, enum hyperdex_client_returncode* status), VALUE self, VALUE spacename, VALUE key, VALUE predicates)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const char* in_key;
     size_t in_key_sz;
     const struct hyperdex_client_attribute_check* in_checks;
     size_t in_checks_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_key(o->arena, key, &in_key, &in_key_sz);
-    hyperdex_ruby_client_convert_predicates(o->arena, predicates, &in_checks, &in_checks_sz);
-    o->reqid = f(client, in_space, in_key, in_key_sz, in_checks, in_checks_sz, &o->status);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_key(arena, key, &in_key, &in_key_sz);
+    hyperdex_ruby_client_convert_predicates(arena, predicates, &in_checks, &in_checks_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_key, in_key_sz, in_checks, in_checks_sz, status);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_key_mapattributes__status(int64_t (*f)(struct hyperdex_client* client, const char* space, const char* key, size_t key_sz, const struct hyperdex_client_map_attribute* mapattrs, size_t mapattrs_sz, enum hyperdex_client_returncode* status), VALUE self, VALUE spacename, VALUE key, VALUE mapattributes)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const char* in_key;
     size_t in_key_sz;
     const struct hyperdex_client_map_attribute* in_mapattrs;
     size_t in_mapattrs_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_key(o->arena, key, &in_key, &in_key_sz);
-    hyperdex_ruby_client_convert_mapattributes(o->arena, mapattributes, &in_mapattrs, &in_mapattrs_sz);
-    o->reqid = f(client, in_space, in_key, in_key_sz, in_mapattrs, in_mapattrs_sz, &o->status);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_key(arena, key, &in_key, &in_key_sz);
+    hyperdex_ruby_client_convert_mapattributes(arena, mapattributes, &in_mapattrs, &in_mapattrs_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_key, in_key_sz, in_mapattrs, in_mapattrs_sz, status);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_key_predicates_mapattributes__status(int64_t (*f)(struct hyperdex_client* client, const char* space, const char* key, size_t key_sz, const struct hyperdex_client_attribute_check* checks, size_t checks_sz, const struct hyperdex_client_map_attribute* mapattrs, size_t mapattrs_sz, enum hyperdex_client_returncode* status), VALUE self, VALUE spacename, VALUE key, VALUE predicates, VALUE mapattributes)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const char* in_key;
     size_t in_key_sz;
@@ -252,173 +268,190 @@ hyperdex_ruby_client_asynccall__spacename_key_predicates_mapattributes__status(i
     size_t in_checks_sz;
     const struct hyperdex_client_map_attribute* in_mapattrs;
     size_t in_mapattrs_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_key(o->arena, key, &in_key, &in_key_sz);
-    hyperdex_ruby_client_convert_predicates(o->arena, predicates, &in_checks, &in_checks_sz);
-    hyperdex_ruby_client_convert_mapattributes(o->arena, mapattributes, &in_mapattrs, &in_mapattrs_sz);
-    o->reqid = f(client, in_space, in_key, in_key_sz, in_checks, in_checks_sz, in_mapattrs, in_mapattrs_sz, &o->status);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_key(arena, key, &in_key, &in_key_sz);
+    hyperdex_ruby_client_convert_predicates(arena, predicates, &in_checks, &in_checks_sz);
+    hyperdex_ruby_client_convert_mapattributes(arena, mapattributes, &in_mapattrs, &in_mapattrs_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_key, in_key_sz, in_checks, in_checks_sz, in_mapattrs, in_mapattrs_sz, status);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_iterator__spacename_predicates__status_attributes(int64_t (*f)(struct hyperdex_client* client, const char* space, const struct hyperdex_client_attribute_check* checks, size_t checks_sz, enum hyperdex_client_returncode* status, const struct hyperdex_client_attribute** attrs, size_t* attrs_sz), VALUE self, VALUE spacename, VALUE predicates)
 {
-    VALUE op;
+    VALUE iterator;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const struct hyperdex_client_attribute_check* in_checks;
     size_t in_checks_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_iterator* o;
-    op = rb_class_new_instance(1, &self, class_iterator);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_iterator, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_predicates(o->arena, predicates, &in_checks, &in_checks_sz);
-    o->reqid = f(client, in_space, in_checks, in_checks_sz, &o->status, &o->attrs, &o->attrs_sz);
+    int64_t reqid;
+    iterator = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Iterator"));
+    struct hyperdex_ds_arena* arena = IV2PTR(iterator, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(iterator, "@status_ptr");
+    const struct hyperdex_client_attribute** attrs = IV2PTR(iterator, "@attrs_ptr");
+    size_t* attrs_sz = IV2PTR(iterator, "@attrs_sz_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_predicates(arena, predicates, &in_checks, &in_checks_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_checks, in_checks_sz, status, attrs, attrs_sz);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_iterator_encode_status_attributes;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(iterator, "@status", Qtrue);
+    rb_iv_set(iterator, "@attrs", Qtrue);
+    rb_iv_set(iterator, "@attrs_sz", Qtrue);
+
+    rb_iv_set(iterator, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), iterator);
+    return iterator;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_predicates__status_description(int64_t (*f)(struct hyperdex_client* client, const char* space, const struct hyperdex_client_attribute_check* checks, size_t checks_sz, enum hyperdex_client_returncode* status, const char** description), VALUE self, VALUE spacename, VALUE predicates)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const struct hyperdex_client_attribute_check* in_checks;
     size_t in_checks_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_predicates(o->arena, predicates, &in_checks, &in_checks_sz);
-    o->reqid = f(client, in_space, in_checks, in_checks_sz, &o->status, &o->description);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    const char** description = IV2PTR(deferred, "@description_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_predicates(arena, predicates, &in_checks, &in_checks_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_checks, in_checks_sz, status, description);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status_description;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+    rb_iv_set(deferred, "@description", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_iterator__spacename_predicates_sortby_limit_maxmin__status_attributes(int64_t (*f)(struct hyperdex_client* client, const char* space, const struct hyperdex_client_attribute_check* checks, size_t checks_sz, const char* sort_by, uint64_t limit, int maxmin, enum hyperdex_client_returncode* status, const struct hyperdex_client_attribute** attrs, size_t* attrs_sz), VALUE self, VALUE spacename, VALUE predicates, VALUE sortby, VALUE limit, VALUE maxmin)
 {
-    VALUE op;
+    VALUE iterator;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const struct hyperdex_client_attribute_check* in_checks;
     size_t in_checks_sz;
     const char* in_sort_by;
     uint64_t in_limit;
     int in_maxmin;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_iterator* o;
-    op = rb_class_new_instance(1, &self, class_iterator);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_iterator, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_predicates(o->arena, predicates, &in_checks, &in_checks_sz);
-    hyperdex_ruby_client_convert_sortby(o->arena, sortby, &in_sort_by);
-    hyperdex_ruby_client_convert_limit(o->arena, limit, &in_limit);
-    hyperdex_ruby_client_convert_maxmin(o->arena, maxmin, &in_maxmin);
-    o->reqid = f(client, in_space, in_checks, in_checks_sz, in_sort_by, in_limit, in_maxmin, &o->status, &o->attrs, &o->attrs_sz);
+    int64_t reqid;
+    iterator = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Iterator"));
+    struct hyperdex_ds_arena* arena = IV2PTR(iterator, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(iterator, "@status_ptr");
+    const struct hyperdex_client_attribute** attrs = IV2PTR(iterator, "@attrs_ptr");
+    size_t* attrs_sz = IV2PTR(iterator, "@attrs_sz_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_predicates(arena, predicates, &in_checks, &in_checks_sz);
+    hyperdex_ruby_client_convert_sortby(arena, sortby, &in_sort_by);
+    hyperdex_ruby_client_convert_limit(arena, limit, &in_limit);
+    hyperdex_ruby_client_convert_maxmin(arena, maxmin, &in_maxmin);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_checks, in_checks_sz, in_sort_by, in_limit, in_maxmin, status, attrs, attrs_sz);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_iterator_encode_status_attributes;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(iterator, "@status", Qtrue);
+    rb_iv_set(iterator, "@attrs", Qtrue);
+    rb_iv_set(iterator, "@attrs_sz", Qtrue);
+
+    rb_iv_set(iterator, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), iterator);
+    return iterator;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_predicates__status(int64_t (*f)(struct hyperdex_client* client, const char* space, const struct hyperdex_client_attribute_check* checks, size_t checks_sz, enum hyperdex_client_returncode* status), VALUE self, VALUE spacename, VALUE predicates)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const struct hyperdex_client_attribute_check* in_checks;
     size_t in_checks_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_predicates(o->arena, predicates, &in_checks, &in_checks_sz);
-    o->reqid = f(client, in_space, in_checks, in_checks_sz, &o->status);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_predicates(arena, predicates, &in_checks, &in_checks_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_checks, in_checks_sz, status);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 
 static VALUE
 hyperdex_ruby_client_asynccall__spacename_predicates__status_count(int64_t (*f)(struct hyperdex_client* client, const char* space, const struct hyperdex_client_attribute_check* checks, size_t checks_sz, enum hyperdex_client_returncode* status, uint64_t* count), VALUE self, VALUE spacename, VALUE predicates)
 {
-    VALUE op;
+    VALUE deferred;
+    struct hyperdex_client* client = IV2PTR(self, "@client");
     const char* in_space;
     const struct hyperdex_client_attribute_check* in_checks;
     size_t in_checks_sz;
-    struct hyperdex_client* client;
-    struct hyperdex_ruby_client_deferred* o;
-    op = rb_class_new_instance(1, &self, class_deferred);
-    rb_iv_set(self, "tmp", op);
-    Data_Get_Struct(self, struct hyperdex_client, client);
-    Data_Get_Struct(op, struct hyperdex_ruby_client_deferred, o);
-    hyperdex_ruby_client_convert_spacename(o->arena, spacename, &in_space);
-    hyperdex_ruby_client_convert_predicates(o->arena, predicates, &in_checks, &in_checks_sz);
-    o->reqid = f(client, in_space, in_checks, in_checks_sz, &o->status, &o->count);
+    int64_t reqid;
+    deferred = rb_class_new_instance(1, &self, rb_path2class("HyperDex::Client::Deferred"));
+    struct hyperdex_ds_arena* arena = IV2PTR(deferred, "@arena_ptr");
+    enum hyperdex_client_returncode* status = IV2PTR(deferred, "@status_ptr");
+    uint64_t* count = IV2PTR(deferred, "@count_ptr");
+    hyperdex_ruby_client_convert_spacename(arena, spacename, &in_space);
+    hyperdex_ruby_client_convert_predicates(arena, predicates, &in_checks, &in_checks_sz);
 
-    if (o->reqid < 0)
+    reqid = f(client, in_space, in_checks, in_checks_sz, status, count);
+
+    if (reqid < 0)
     {
-        hyperdex_ruby_client_throw_exception(o->status, hyperdex_client_error_message(client));
+        hyperdex_ruby_client_throw_exception(*status, hyperdex_client_error_message(client));
     }
 
-    o->encode_return = hyperdex_ruby_client_deferred_encode_status_count;
-    rb_hash_aset(rb_iv_get(self, "ops"), LONG2NUM(o->reqid), op);
-    rb_iv_set(self, "tmp", Qnil);
-    return op;
+    rb_iv_set(deferred, "@status", Qtrue);
+    rb_iv_set(deferred, "@count", Qtrue);
+
+    rb_iv_set(deferred, "@reqid", LONG2NUM(reqid));
+    rb_hash_aset(rb_iv_get(self, "@ops"), LONG2NUM(reqid), deferred);
+    return deferred;
 }
 static VALUE
 hyperdex_ruby_client_get(VALUE self, VALUE spacename, VALUE key)

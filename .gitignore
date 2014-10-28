@@ -1,0 +1,6 @@
+/ext/Makefile
+*.o
+*.so
+*.gem
+/pkg/
+/Gemfile.lock
