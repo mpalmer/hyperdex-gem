@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
 	spec.name          = "hyperdex"
-	spec.version       = "1.4.4.2"
+	spec.version       = "1.4.4.3"
 	spec.authors       = ["Matt Palmer"]
 	spec.email         = ["mpalmer@hezmatt.org"]
 	spec.summary       = "Hyperdex client bindings"
