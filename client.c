@@ -1484,7 +1484,7 @@ hyperdex_ruby_client_loop(VALUE self)
     }
 }
 
-#include "bindings/ruby/definitions.c"
+#include "definitions.c"
 
 /********************************* Predicates *********************************/
 
@@ -1702,7 +1702,7 @@ Init_hyperdex_client()
     rb_define_method(class_client, "initialize", hyperdex_ruby_client_init, 2);
     rb_define_method(class_client, "loop", hyperdex_ruby_client_loop, 0);
     /* include the generated rb_define_* calls */
-#include "bindings/ruby/prototypes.c"
+#include "prototypes.c"
 
     /* create the Predicate class */
     class_predicate = rb_define_class_under(mod_hyperdex_client, "Predicate", rb_cObject);
