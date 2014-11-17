@@ -3,7 +3,7 @@ require 'ffi/enum_generator'
 
 module HyperDex::FFI::DS
 	extend ::FFI::Library
-	ffi_lib 'hyperdex-client.so.0'
+	ffi_lib ['hyperdex-client.so.0', 'hyperdex-client.0']
 
 	generate_enum :hyperdatatype do |eg|
 		eg.include "hyperdex.h"

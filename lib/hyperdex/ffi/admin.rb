@@ -3,7 +3,7 @@ require 'ffi/enum_generator'
 
 module HyperDex::FFI::Admin
 	extend ::FFI::Library
-	ffi_lib 'hyperdex-admin.so.0'
+	ffi_lib ['hyperdex-admin.so.0', 'hyperdex-admin.0']
 
 	generate_enum :hyperdex_admin_returncode do |eg|
 		eg.include "hyperdex/admin.h"
