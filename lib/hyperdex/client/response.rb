@@ -61,10 +61,7 @@ class HyperDex::Client::Response
 		when HyperDex::Client::CMPFAIL
 			false
 		else
-			raise HyperDex::Client::HyperDexClientException.new(
-			        status,
-			        @client.error_message
-			      )
+			raise HyperDex::Client.exception(status, @client.error_message)
 		end
 	end
 end

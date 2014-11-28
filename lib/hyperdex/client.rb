@@ -11,6 +11,10 @@ module HyperDex::Client
 		end
 	end
 
+	def self.exception(status, message)
+		HyperDex::Client::Exception::Map[status].new(message)
+	end
+
 	def self.build_attribute(attr)
 		type = attr[:datatype]
 		value = attr[:value].read_string(attr[:value_sz])
@@ -22,10 +26,8 @@ module HyperDex::Client
 		when :INT64
 			i = ::FFI::MemoryPointer.new(:int64_t)
 			if HyperDex::FFI::DS.unpack_int(attr[:value], attr[:value_sz], i) < 0
-				raise HyperDex::Client::HyperDexClientException.new(
-				        HyperDex::Client::SERVERERROR,
-				        "server sent malformed int attribute (#{value.inspect})"
-				      )
+				raise HyperDex::Client::ServerError,
+				      "server sent malformed int attribute (#{value.inspect})"
 			end
 
 			i.read_int64
@@ -33,10 +35,8 @@ module HyperDex::Client
 		when :FLOAT
 			d = ::FFI::MemoryPointer.new(:double)
 			if HyperDex::FFI::DS.unpack_float(attr[:value], attr[:value_sz], d) < 0
-				raise HyperDex::Client::HyperDexClientException.new(
-				        HyperDex::Client::SERVERERROR,
-				        "server sent malformed float attribute (#{value.inspect})"
-				      )
+				raise HyperDex::Client::ServerError,
+				      "server sent malformed float attribute (#{value.inspect})"
 			end
 
 			d.read_double
@@ -45,10 +45,8 @@ module HyperDex::Client
 			begin
 				JSON.parse(value)
 			rescue JSON::ParserError
-				raise HyperDex::Client::HyperDexClientException.new(
-				        HyperDex::Client::SERVERERROR,
-				        "server sent malformed attribute(document)"
-				      )
+				raise HyperDex::Client::ServerError,
+				      "server sent malformed attribute(document)"
 			end
 
 		when :LIST_STRING
@@ -59,10 +57,8 @@ module HyperDex::Client
 			res = []
 			while (result = HyperDex::FFI::DS.iterate_list_string_next(iter, ptr, len)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed list(string)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed list(string)"
 				end
 
 				str = ptr.read_pointer
@@ -78,10 +74,8 @@ module HyperDex::Client
 			res = []
 			while (result = HyperDex::FFI::DS.iterate_list_int_next(iter, int)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed list(int)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed list(int)"
 				end
 
 				res << int.read_int64
@@ -96,10 +90,8 @@ module HyperDex::Client
 			res = []
 			while (result = HyperDex::FFI::DS.iterate_list_float_next(iter, dbl)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed list(float)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed list(float)"
 				end
 
 				res << dbl.read_double
@@ -115,10 +107,8 @@ module HyperDex::Client
 			res = Set.new
 			while (result = HyperDex::FFI::DS.iterate_set_string_next(iter, ptr, len)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed set(string)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed set(string)"
 				end
 
 				str = ptr.read_pointer
@@ -134,10 +124,8 @@ module HyperDex::Client
 			res = Set.new
 			while (result = HyperDex::FFI::DS.iterate_set_int_next(iter, int)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed set(int)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed set(int)"
 				end
 
 				res << int.read_int64
@@ -152,10 +140,8 @@ module HyperDex::Client
 			res = Set.new
 			while (result = HyperDex::FFI::DS.iterate_set_float_next(iter, dbl)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed set(float)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed set(float)"
 				end
 
 				res << dbl.read_double
@@ -173,10 +159,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_string_string_next(iter, kptr, klen, vptr, vlen)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(string, string)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(string, string)"
 				end
 
 				kstr = kptr.read_pointer
@@ -197,10 +181,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_string_int_next(iter, kptr, klen, vint)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(string, int)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(string, int)"
 				end
 
 				kstr = kptr.read_pointer
@@ -219,10 +201,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_string_float_next(iter, kptr, klen, vdbl)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(string, float)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(string, float)"
 				end
 
 				kstr = kptr.read_pointer
@@ -241,10 +221,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_int_string_next(iter, kint, vptr, vlen)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(int, string)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(int, string)"
 				end
 
 				vstr = vptr.read_pointer
@@ -262,10 +240,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_int_int_next(iter, kint, vint)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(int, int)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(int, int)"
 				end
 
 				res[kint.read_int64] = vint.read_int64
@@ -281,10 +257,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_int_float_next(iter, kint, vdbl)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(int, float)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(int, float)"
 				end
 
 				res[kint.read_int64] = vdbl.read_double
@@ -301,10 +275,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_float_string_next(iter, kdbl, vptr, vlen)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(float, string)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(float, string)"
 				end
 
 				vstr = vptr.read_pointer
@@ -322,10 +294,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_float_int_next(iter, kdbl, vint)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(float, int)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(float, int)"
 				end
 
 				res[kdbl.read_double] = vint.read_int64
@@ -341,10 +311,8 @@ module HyperDex::Client
 			res = {}
 			while (result = HyperDex::FFI::DS.iterate_map_float_float_next(iter, kdbl, vdbl)) > 0
 				if result < 0
-					raise HyperDex::Client::HyperDexClientException.new(
-					        HyperDex::Client::SERVERERROR,
-					        "server sent malformed map(int, float)"
-					      )
+					raise HyperDex::Client::ServerError,
+					      "server sent malformed map(int, float)"
 				end
 
 				res[kdbl.read_double] = vdbl.read_double
@@ -353,10 +321,8 @@ module HyperDex::Client
 			res
 
 		else
-			raise HyperDex::Client::HyperDexClientException.new(
-			        HyperDex::Client::SERVERERROR,
-			        "server sent malformed attributes"
-			      )
+			raise HyperDex::Client::ServerError,
+			      "server sent malformed attributes"
 		end
 	end
 
@@ -372,6 +338,6 @@ end
 
 require_relative 'client/client'
 require_relative 'client/deferred'
-require_relative 'client/hyperdex_client_exception'
+require_relative 'client/exception'
 require_relative 'client/iterator'
 require_relative 'client/response'

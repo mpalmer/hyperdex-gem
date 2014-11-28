@@ -16,10 +16,7 @@ class HyperDex::Client::Client
 		rc = ::FFI::MemoryPointer.new(HyperDex::FFI::Client.enum_type(:hyperdex_client_returncode).native_type)
 		while (ret = HyperDex::FFI::Client.hyperdex_client_loop(@client, timeout, rc)) < 0
 			if rc.read_int32 != HyperDex::Client::INTERRUPTED
-				raise HyperDex::Client::HyperDexClientException.new(
-				        rc.read_int32,
-				        self.error_message
-				      )
+				raise HyperDex::Client.exception(rc.read_int32, self.error_message)
 			end
 		end
 
@@ -28,10 +25,8 @@ class HyperDex::Client::Client
 
 	def poll_fd
 		if (fd = HyperDex::FFI::Client.hyperdex_client_poll(@client)) < 0
-			raise HyperDex::Client::HyperDexClientException.new(
-			        HyperDex::Client::EXCEPTION,
-			        "CAN'T HAPPEN: hyperdex_client_poll failed!"
-			      )
+			raise HyperDex::Client::PollFailed,
+			      self.error_messsage
 		end
 
 		fd

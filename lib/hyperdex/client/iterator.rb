@@ -12,9 +12,7 @@ class HyperDex::Client::Iterator < HyperDex::Client::Response
 		elsif status == HyperDex::Client::SUCCESS
 			@backlog << encode_return
 		else
-			@backlog << HyperDex::Client::HyperDexClientException.new(
-			              status, @client.error_message
-			            )
+			@backlog << HyperDex::Client::exception(status, @client.error_message)
 		end
 	end
 

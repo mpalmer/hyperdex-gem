@@ -40,7 +40,6 @@
 
 extern VALUE mod_hyperdex;
 static VALUE mod_hyperdex_client;
-static VALUE class_exception;
 static VALUE Set;
 static VALUE class_client;
 static VALUE class_predicate;
@@ -71,7 +70,9 @@ hyperdex_ruby_client_throw_exception(enum hyperdex_client_returncode status,
                                      const char* error_message)
 {
     VALUE args[2] = { INT2NUM(status), rb_str_new2(error_message) };
-    rb_exc_raise(rb_class_new_instance(2, args, class_exception));
+    VALUE klass   = rb_path2class("HyperDex::Client");
+
+    rb_exc_raise(rb_funcall2(klass, rb_intern("exception"), 2, args));
 }
 
 /******************************* Predicate class ******************************/
@@ -903,9 +904,6 @@ Init_hyperdex_client()
 
     /* setup the module */
     mod_hyperdex_client = rb_define_module_under(mod_hyperdex, "Client");
-
-    /* create the Exception class */
-    class_exception = rb_define_class_under(mod_hyperdex_client, "HyperDexClientException", rb_eStandardError);
 
     /* create the Client class */
     class_client = rb_define_class_under(mod_hyperdex_client, "Client", rb_cObject);
