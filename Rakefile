@@ -37,6 +37,7 @@ RSpec::Core::RakeTask.new :test do |t|
 	t.pattern = "spec/**/*_spec.rb"
 end
 
+desc "Compile the extension"
 task :compile => 'ext/Makefile' do
 	Dir.chdir(File.expand_path('../ext', __FILE__)) do
 		sh "make"
