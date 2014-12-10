@@ -17,10 +17,14 @@ class HyperDex::Client::Iterator < HyperDex::Client::Response
 	end
 
 	def has_next?
-		@client.loop until @finished or !@backlog.empty?
+		@client.loop until finished? or item_available?
 		!@backlog.empty?
 	end
 	alias_method :has_next, :has_next?
+
+	def item_available?
+		!(finished? or @backlog.empty?)
+	end
 
 	def next
 		@backlog.shift

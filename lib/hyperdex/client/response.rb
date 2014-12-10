@@ -31,12 +31,16 @@ class HyperDex::Client::Response
 	end
 
 	def callback
-		@finished = 1
+		@finished = true
 		@client.delete_op(@reqid)
 	end
 
 	def status
 		@status_ptr.read_int32
+	end
+
+	def finished?
+		@finished
 	end
 
 	private
